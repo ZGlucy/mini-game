@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>富足到家 · AI客服（打开即聊）</title>
+<style>
+:root{--bg:#f2f4f7;--card:#fff;--line:#e5e7eb;--txt:#111827;--sub:#6b7280;--me:#95ec69;--brand:#07c160}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--txt)}
+header{position:fixed;top:0;left:0;right:0;background:var(--brand);color:#fff;padding:10px 12px;display:flex;align-items:center;gap:10px;z-index:20;padding-top:calc(10px + env(safe-area-inset-top))}
+header .av{width:36px;height:36px;border-radius:6px;background:#fff;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex:none}
+header .ttl{flex:1;min-width:0}
+header b{font-size:15px;display:block;line-height:1.2}
+header small{opacity:.85;font-size:10px;display:block;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .acts{display:flex;gap:6px;flex:none}
+header .acts button{width:34px;height:34px;border:0;border-radius:8px;background:rgba(255,255,255,.18);color:#fff;font-size:16px;position:relative;line-height:1}
+header .acts button span{position:absolute;top:-4px;right:-4px;background:#fa5151;color:#fff;font-size:9px;border-radius:8px;padding:0 4px;line-height:13px}
+#log{padding:64px 12px 8px;max-width:760px;margin:0 auto;padding-bottom:8px}
+.sys{text-align:center;font-size:11px;color:#9ca3af;margin:6px 0 10px}
+.msg{display:flex;margin:10px 0}
+.msg.me{justify-content:flex-end}
+.bub{max-width:78%;padding:9px 12px;border-radius:8px;white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line)}
+.msg.me .bub{background:var(--me);border-color:#7ed321}
+.meta{margin-top:5px;display:flex;gap:8px;font-size:11px;color:var(--sub);align-items:center}
+.msg.me .meta{justify-content:flex-end}
+.meta button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;font-size:11px;color:var(--sub)}
+#chips{position:fixed;left:0;right:0;bottom:56px;display:flex;gap:8px;padding:6px 12px;overflow-x:auto;max-width:760px;margin:0 auto;z-index:15;-webkit-overflow-scrolling:touch}
+#chips button{flex:none;border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-size:12px;color:#374151;white-space:nowrap}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px 10px;display:flex;gap:8px;max-width:760px;margin:0 auto;z-index:16;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+.bar input{flex:1;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:15px;min-width:0}
+.bar button{padding:0 16px;background:var(--brand);color:#fff;border:0;border-radius:8px;font-size:15px}
+.ov{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;max-width:760px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.ov .ohead{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--line);padding:12px;display:flex;align-items:center;gap:10px;z-index:5}
+.ov .ohead b{flex:1;font-size:15px}
+.ov .ohead button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px}
+.hide{display:none!important}
+.page{padding:12px 12px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 10px;font-size:14px}
+.card label{display:block;font-size:12px;color:var(--sub);margin:8px 0 4px}
+.card input,.card textarea{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;font-size:14px;font-family:inherit}
+.card textarea{min-height:96px;resize:vertical}
+.btn{padding:10px 16px;background:var(--brand);color:#fff;border:0;border-radius:8px;font-size:14px;width:100%;margin-bottom:10px}
+.btn.ghost{background:#fff;color:var(--txt);border:1px solid var(--line)}
+.tip{background:#fff8e6;border:1px solid #ffe0a3;border-radius:8px;padding:10px;font-size:13px;margin-bottom:12px;line-height:1.6}
+.fb{border-bottom:1px solid var(--line);padding:9px 0;font-size:13px}
+.fb .q{font-weight:600}
+.fb .a{color:var(--sub);margin:3px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="av">富</div>
+  <div class="ttl"><b>富足到家 · AI客服</b><small id="sub">试用演示版 · 未接真实业务</small></div>
+  <div class="acts">
+    <button onclick="openSet()" title="改资料">⚙️</button>
+    <button onclick="openFB()" title="需求清单">📋<span id="fbn"></span></button>
+  </div>
+</header>
+
+<div id="log"></div>
+
+<div id="chips">
+  <button onclick="quick('有什么项目')">有什么项目</button>
+  <button onclick="quick('价格多少')">价格多少</button>
+  <button onclick="quick('怎么预约')">怎么预约</button>
+  <button onclick="quick('转人工')">转人工</button>
+</div>
+
+<div class="bar">
+  <input id="inp" placeholder="以客人身份打字，测 AI 答得准不准" onkeydown="if(event.key==='Enter')send()">
+  <button onclick="send()">发送</button>
+</div>
+
+<div id="p-set" class="ov hide">
+  <div class="ohead"><b>⚙️ 改资料（先填真实数据再测）</b><button onclick="closeOv('p-set')">关闭</button></div>
+  <div class="page">
+    <div class="tip"><b>必做：</b>下面预填的是<b>行业通用口径</b>，不是你们家的真实数据。逐条改成真实价目与规则，点「保存并生效」后立刻生效，再去测对话。不改就测，测出来的全是错的。</div>
+    <div class="card">
+      <h3>一、项目与价格（每行：项目名 | 价格 | 一句话说明 | 标签）</h3>
+      <textarea id="s_services"></textarea>
+    </div>
+    <div class="card">
+      <h3>二、活动（每行：活动名 | 说明）</h3>
+      <textarea id="s_acts"></textarea>
+    </div>
+    <div class="card">
+      <h3>三、规则</h3>
+      <label>上门费/距离</label><input id="s_fee">
+      <label>下单锁总价</label><input id="s_upfront">
+      <label>安全与保障（每行一条）</label><textarea id="s_safety" style="min-height:80px"></textarea>
+      <label>预约流程（每行一步）</label><textarea id="s_booking" style="min-height:80px"></textarea>
+    </div>
+    <div class="card">
+      <h3>四、话术</h3>
+      <label>开场白</label><input id="s_greet">
+      <label>报价格前缀</label><input id="s_pp">
+      <label>报价后追问</label><input id="s_ps">
+      <label>看项目后追问</label><input id="s_ss">
+      <label>转人工</label><input id="s_transfer">
+      <label>越界划界</label><input id="s_boundary">
+      <label>兜底</label><input id="s_fallback">
+    </div>
+    <div class="card">
+      <h3>五、常见问答（每行：关键词,逗号分隔 | 问题 | 答案）</h3>
+      <textarea id="s_faq"></textarea>
+    </div>
+    <button class="btn" onclick="saveKB()">保存并生效</button>
+    <button class="btn ghost" onclick="closeOv('p-set')">返回对话</button>
+  </div>
+</div>
+
+<div id="p-fb" class="ov hide">
+  <div class="ohead"><b>📋 需求清单</b><button onclick="closeOv('p-fb')">关闭</button></div>
+  <div class="page">
+    <div class="tip">答得不对的地方点 👎，攒成需求清单，<b>导出文件发回给对接人</b>，见面直接拿它谈。</div>
+    <div class="card"><h3>已收集的问题（<span id="fbc">0</span>）</h3><div id="fblist"></div></div>
+    <button class="btn" onclick="exportFB()">导出清单（Markdown）</button>
+    <button class="btn ghost" onclick="clearFB()">清空</button>
+  </div>
+</div>
+
+<script>
+var DEF_KB = {"__meta": {"version": "3.1", "updated": "2026-10-19", "note": "价目表按 2026 上门推拿/上门SPA 行业真实价格带重建（交叉对标：到位、舒养到家、立上家、邻家科技等在营平台公开价目）。FAQ 按上门服务行业真实客户高频问法重建（30条）。【标注【待确认】的字段需客户核实后替换，未核实前仅用于演示，勿对客报价。", "data_source": "2026-10-15 检索：到位 daoway.cn、舒养到家 shuyangdaojia.com、立上家 lishangjia.cn、邻家科技官方直约店公开价目", "todo": ["【待确认】全部项目名称与价格 → 客户提供真实价目表后替换", "【待确认】覆盖城市数（当前按客户自述口径填 156 城）", "【待确认】技师人数（平台自述 9860，待客户核实）", "【待确认】活动规则细节：周半价具体星期几 / 新客券面额 / 免车费里程数", "【待确认】上门费规则：3 公里内免、超出每公里单价", "【待确认】是否支持男女技师可选", "【待确认】营业时段与最晚预约时间", "【待确认】FAQ 中涉及平台承诺的表述（发票/投诉/退款/回访）需客户确认与其实际流程一致"]}, "brand": {"name": "富足到家", "positioning": "专业上门推拿/上门SPA，主打正规、持证、可追溯", "slogan": "专业、舒适、正规、安全的服务体验。无需出门，一键预约。", "tone": "像真人客服：亲切、专业、有分寸。不暧昧、不暗示、不引导私下交易、不催单骚扰。"}, "services": [{"name": "颈肩专项推拿", "desc": "久坐低头族，针对颈椎、肩周僵硬，重点松解颈肩", "price": "¥158 起 / 45分钟", "tag": "久坐首选", "pain": ["肩颈", "脖子", "僵硬", "低头", "颈椎", "肩周", "肩膀", "脖子疼", "脖子酸", "硬得像"]}, {"name": "经典中式推拿", "desc": "全身推拿，疏通经络、缓解肌肉疲劳", "price": "¥168 起 / 60分钟", "tag": "新客特惠", "pain": ["全身", "累", "疲劳", "放松", "疏通", "经络", "第一次", "试试"]}, {"name": "全身推拿", "desc": "头肩颈腹腰背四肢完整放松", "price": "¥218 起 / 70分钟", "tag": "销量第一", "pain": ["全身", "疲劳", "累", "腰", "背", "腰疼", "腰痛", "背痛", "腰背"]}, {"name": "通络舒养SPA", "desc": "缓解肌肉劳损、改善睡眠", "price": "¥268 起 / 70分钟", "tag": "热销", "pain": ["睡不好", "失眠", "疲劳", "累", "亚健康", "睡不着", "熬夜"]}, {"name": "全身精油SPA", "desc": "精油全身按摩，改善睡眠、促进循环", "price": "¥298 起 / 70分钟", "tag": "经典", "pain": ["精油", "放松", "睡不好", "皮肤", "舒肤", "皮肤干", "脸上", "气色", "肤色"]}, {"name": "川式采耳", "desc": "专业采耳 + 头部放松，纾解压力、静心助眠", "price": "¥238 起 / 60分钟", "tag": "解压", "pain": ["采耳", "耳朵", "耳", "助眠", "解压", "耳鸣"]}, {"name": "足疗SPA", "desc": "小腿放松 + 足部精油 SPA", "price": "¥268 起 / 80分钟", "tag": "腿部", "pain": ["腿", "脚", "水肿", "走路累", "足", "腿疼", "腿酸", "腿肿", "脚疼"]}, {"name": "精品养生SPA", "desc": "深层养护，适合长期调理", "price": "¥368 起 / 70分钟", "tag": "进阶", "pain": ["养生", "调理", "长期", "亚健康", "虚弱"]}, {"name": "经典舒缓SPA", "desc": "活血化瘀、深度缓解压力", "price": "¥398 起 / 80分钟", "tag": "进阶", "pain": ["压力", "放松", "解压", "累"]}, {"name": "疏通经络SPA", "desc": "重点疏通经络，加速代谢、助眠", "price": "¥498 起 / 90分钟", "tag": "高端", "pain": ["经络", "代谢", "助眠", "调理"]}, {"name": "固本培元SPA", "desc": "全身深层养护，阴阳平衡", "price": "¥598 起 / 100分钟", "tag": "高端", "pain": ["养生", "调理", "疲惫", "深度"]}], "pain_map_hint": "客户说痛点时，先从 pain 标签里匹配最贴的项目再推荐，比直接甩全量价目表转化率高得多。", "activities": [{"code": "new_user", "name": "新客首单立减", "desc": "首次注册下单立减，具体金额以下单页为准", "hook": "新客首单有立减，比直接原价下单划算"}, {"code": "weekly_half", "name": "周半价", "desc": "每周固定日指定项目半价（【待确认】具体星期与项目）", "hook": "每周有半价日，指定项目半价"}, {"code": "free_ride", "name": "免车费", "desc": "【待确认】3 公里内免上门费，超出部分按里程计费，下单时明码标价", "hook": "近处上门免车费，下单即锁总价"}], "fee_rules": {"upfront": "下单时即锁定总价，正规平台明码标价，服务中不推销、不临时加价。", "distance": "【待确认】3 公里内免上门费，超出部分每公里 3-5 元，下单页自动计算", "no_hidden": "无隐形消费，服务中若有违规推销可随时投诉。"}, "safety": ["技师均持证上岗、实名认证，服务信息可在小程序内查看。", "平台担保交易，服务完成后付款，满意再评价。", "服务范围仅限正规推拿/SPA调理，不接受任何违规要求。", "服务中不推销办卡、不临时加价，有问题可随时投诉。"], "compliance": ["严禁任何暧昧暗示、性相关暗示、擦边话术。", "严禁引导私下转账、绕过平台交易、添加私人联系方式下单。", "严禁承诺疗效（治愈疾病、根治等），只能说缓解不适、改善体验。", "严禁替技师私下议价、承诺平台无法保证的结果（如指定某位技师）。", "遇到越界请求：礼貌划界 + 说明只提供正规服务 + 转人工，不辩解、不说教。"], "booking": {"steps": ["在公众号菜单或小程序选项目与时长", "填写上门地址和期望时间", "系统派单，技师接单后与您电话确认", "上门服务，平台担保结算，满意再评价"], "note": "无需出门，一键预约。最快 30 分钟上门。", "need_fields": ["城市/区域", "上门地址或小区", "期望时间（今天/明天/周末/具体时段）", "主要想缓解哪里不适"]}, "faq": [{"keys": ["收费", "怎么收费", "加价", "贵", "怎么算钱"], "q": "怎么收费", "a": "按项目和时长计费，下单时即锁定总价，明码标价，不会有隐形消费或服务中加价。"}, {"keys": ["多长时间", "时长", "一次多久", "做一次", "多久一次"], "q": "服务多久", "a": "常规 45-100 分钟，按您选的项目来，页面标注的是标准时长。"}, {"keys": ["公司", "成立", "老店", "品牌", "什么公司"], "q": "公司成立多久了", "a": "富足到家是正规注册运营的上门健康服务平台，运营主体信息可以在小程序「关于我们」里查看，技师、订单、售后全程平台监管。"}, {"keys": ["营业执照", "注册", "公司正规", "备案", "资质"], "q": "有营业执照吗", "a": "有的，平台运营公司是正规注册企业，营业执照和备案信息在官网和小程序里都能查到，服务全程可追溯。"}, {"keys": ["照片", "图片", "本人", "和真人", "长什么样"], "q": "技师照片是真人吗", "a": "小程序里展示的技师都是实名认证的本人，如果照片和真人不符，您可以随时投诉，我们核实后会处理。"}, {"keys": ["健康证", "体检", "健康"], "q": "技师有健康证吗", "a": "技师上岗前都要求提供健康证明并实名登记，服务记录平台可查，您放心。"}, {"keys": ["隐私", "泄露", "个人信息", "家庭住址", "地址安全", "保密"], "q": "隐私安全吗", "a": "您的电话和地址只有接单技师和平台可见，全程加密处理，服务完成后不会留存您的个人信息，平台对信息泄露零容忍。"}, {"keys": ["多久能上门", "多久到", "多长时间到", "派单", "接单快", "多久能到"], "q": "多久能上门", "a": "下单后系统就近派单，最快 30 分钟左右就能到，具体以上单页显示的预计上门时间为准。"}, {"keys": ["最晚", "营业", "下班", "凌晨", "半夜", "深夜", "晚上几点"], "q": "最晚几点能预约", "a": "我们晚上正常接单，最晚可约时间以小程序当天显示为准；如果太晚，我也可以帮您约明天的。"}, {"keys": ["周末", "节假日", "假日", "过年", "春节", "国庆", "星期天"], "q": "周末节假日能上门吗", "a": "可以，周末和节假日正常接单，不过高峰期技师紧张，建议您提前一点预约。"}, {"keys": ["准备", "要带什么", "带什么", "工具", "按摩床", "需不需要"], "q": "需要准备什么吗", "a": "不用特别准备，有一块能躺下的空间就行；按摩床、床单、毛巾、精油这些用品技师都会随身带过来。"}, {"keys": ["洗澡", "先洗", "沐浴"], "q": "需要先洗澡吗", "a": "不用特意准备，正常状态就可以；想先洗个澡放松一下也完全没问题。"}, {"keys": ["一次性", "床单", "毛巾", "卫生", "消毒", "干不干净", "干净"], "q": "用品卫生吗", "a": "每位客户用的都是一次性床单和毛巾，按摩床也会当场消毒，技师服务前后都会清洁，您放心。"}, {"keys": ["精油", "过敏", "肤质", "敏感"], "q": "精油会过敏吗", "a": "精油用的都是正规品牌；如果您是敏感肤质，下单时备注一下，技师会换成无香型或基础油，也可以做不含精油的项目。"}, {"keys": ["力度", "轻一点", "重一点", "使力", "用力", "太轻", "太重"], "q": "力度能调吗", "a": "当然可以，服务过程中您随时说轻一点或重一点，技师会按您的接受程度来，沟通不另外收费。"}, {"keys": ["做完酸", "按完酸", "酸胀", "做完之后", "做完后", "按完", "做完有点"], "q": "做完酸胀正常吗", "a": "做完有点酸胀是正常的，说明经络在疏通，一般一两天就缓解；多喝水、注意休息恢复得更快。如果明显不适可以联系我们，我们会跟进处理。"}, {"keys": ["孕妇", "怀孕", "生理期", "例假", "月经", "血压", "高血压", "酒后", "喝酒", "心脏病", "手术后", "发烧", "哺乳期"], "q": "孕妇/高血压能做吗", "a": "孕期、生理期、高血压、心脏病、酒后这些情况不建议做推拿和 SPA，为了您的安全建议先咨询医生；日常调理需求我们随时欢迎。"}, {"keys": ["老人", "年纪大", "年龄", "多大年纪", "老年人", "多大"], "q": "老人能做吗", "a": "可以，年纪大的客人我们会安排经验丰富、手法温和的技师，下单时备注一下年龄和身体情况，力度会控制得更轻。"}, {"keys": ["停车", "停车费", "车位", "门禁", "小区"], "q": "停车/进小区麻烦吗", "a": "门禁和停车问题技师会提前和您电话沟通，您到时配合开一下门就行，不额外收取费用。"}, {"keys": ["加钟", "延长", "加时间", "超时"], "q": "能加钟吗", "a": "可以加钟，费用按项目时价折算，服务前和技师确认好就行，平台明码标价。"}, {"keys": ["储值", "会员", "办卡", "充值", "VIP", "vip"], "q": "会员怎么储值", "a": "我们目前主打单次预约、明码标价，不推销办卡；新客福利和半价活动以下单页为准，有需要我给您介绍当前活动。"}, {"keys": ["发票", "开票", "报销"], "q": "能开发票吗", "a": "可以，下单后在订单详情里申请开票，或者留个邮箱我帮您登记，电子发票会发到您预留的邮箱。"}, {"keys": ["支付", "付款", "怎么付", "微信支付", "支付宝", "刷卡", "现金", "能付"], "q": "支持什么支付", "a": "小程序里微信支付就可以，服务完成后平台结算，满意再确认，全程有平台担保。"}, {"keys": ["团购", "美团", "大众点评", "抖音"], "q": "团购券能用吗", "a": "我们主要在自有小程序里预约，价格和活动统一；如果您手上有其它平台的券，可以发我看下能不能用。"}, {"keys": ["定金", "押金", "预付款"], "q": "要交定金吗", "a": "不需要定金，服务完成后再付款，平台担保交易，您满意再确认。"}, {"keys": ["迟到", "晚了", "不准时", "没到"], "q": "技师迟到怎么办", "a": "如果技师迟到，平台会提前告知并协调；耽误了您的时间可以在订单里申诉，我们会跟进处理并给您一个说法。"}, {"keys": ["回访", "售后", "客服热线", "电话多少", "联系你们", "人工电话"], "q": "怎么联系你们", "a": "您在这个对话框里直接说就行，我一直在线；也可以拨打小程序「联系我们」里的客服热线。"}, {"keys": ["那种服务", "特殊服务", "不正规", "黄色", "色情"], "q": "有没有特殊服务", "a": "我们只提供正规上门推拿和 SPA 理疗，没有也不提供其它服务。身体调理需求我很乐意帮您安排。"}], "lead_questions": {"ask_city": "方便说一下您在哪个城市吗？我帮您确认附近站点~", "ask_pain": "您主要是哪里不舒服呢？（肩颈 / 腰背 / 睡眠 / 全身放松）我给您挑最合适的项目。", "ask_time": "您想什么时候上门？我看看当天还有没有名额~", "ask_first": "第一次体验的话推荐经典中式推拿，60 分钟，您看合适吗？"}, "lead_script": {"greeting": "您好，我是富足到家客服小富~ 我们是正规上门推拿/SPA，技师持证上岗。请问您想了解项目价格，还是直接帮您约一次？", "price_prefix": "我们项目明码标价，下单即锁总价：", "price_suffix": "您是第一次体验吧？新客首单有立减，我可以帮您直接约上~", "service_suffix": "您主要想缓解哪里不适？我给您挑最合适的。", "booking_confirm": "好的~ 麻烦您确认一下：{项目}（{时长}）、上门地址在哪个城市哪个小区、想什么时候上门？我这就帮您提交。", "handoff": "好的，已为您提交，技师接单后会与您电话确认。您这边还有其它想了解的吗？"}, "transfer_script": "您的问题我为您转接专属顾问，稍后由人工客服为您详细跟进，请稍候~", "boundary_script": "不好意思，我们提供的是正规上门推拿和 SPA 理疗服务，其它需求暂时没办法满足。如您有肩颈、腰背、睡眠方面的调理需求，我可以为您推荐合适的项目；其它问题我帮您转人工说明。", "fallback": "您是想了解价格、项目，还是直接帮您预约呢？也可以直接告诉我哪里不舒服，我给您推荐合适的项目~", "identity_script": "我是 AI 客服助手，不是真人~ 简单问题我可以直接帮您解决；如果涉及具体订单、改期、退款这类，我马上帮您转人工客服跟进。"};
+var TRANSFER = ["人工", "转人工", "真人客服", "真人服务", "客服在吗", "投诉", "退款", "差评", "举报", "工商", "报警", "曝光", "315", "维权", "骗子"];
+var BOUNDARY = ["约炮", "裸", "性服务", "特殊服务", "包夜", "全套", "出台", "私下", "不加平台", "加微信", "加微", "私人联系方式", "私下转账", "私下付款", "发红包", "红包付", "便宜点少点", "你懂的", "懂的都懂", "懂的", "特殊", "服务点", "涉黄", "黄色", "成人", "按摩店", "可以出台", "想玩", "刺激", "_wrapper", "wrapper", "包服务", "一条龙", "出国", "外围", "微信", "私聊", "私我", "避开平台", "不走平台", "不通过平台", "不走公司"];
+var LS_KB='fuzu_kb_v1', LS_FB='fuzu_fb_v1';
+var hist=[], fb=[];
+
+function getKB(){try{var s=localStorage.getItem(LS_KB);return s?JSON.parse(s):DEF_KB}catch(e){return DEF_KB}}
+function saveStore(){try{localStorage.setItem(LS_KB,JSON.stringify(getKB()))}catch(e){}}
+
+function hit(t,ws){for(var i=0;i<ws.length;i++){if(t.indexOf(ws[i])>=0)return true}return false}
+function isQ(m){return /[吗呢吧？?！!]/.test(m)||/怎么|什么|能不能|可以|多少|多久|多大|有没有|是不是|会不会|行不行|几点|哪/.test(m)}
+
+function byPain(m,KB){
+  var out=[];
+  for(var i=0;i<KB.services.length;i++){
+    var s=KB.services[i],p=s.pain||[];
+    for(var j=0;j<p.length;j++){if(m.indexOf(p[j])>=0&&out.indexOf(s)<0){out.push(s);break}}
+  }
+  return out.slice(0,3);
+}
+
+function reply(u){
+  var KB=getKB(),S=KB.lead_script||{},m=(u||'').trim();
+  if(hit(m,TRANSFER))return{t:S2(KB,'transfer'),i:'transfer',h:true};
+  if(hit(m,BOUNDARY))return{t:S2(KB,'boundary'),i:'boundary',h:true};
+  if(hit(m,['机器人','人工吗','是不是人','真人吗'])&&m.indexOf('照片')<0)
+    return{t:KB.identity_script,i:'identity'};
+  if(hit(m,['你好','您好','在吗','hi','hello','在么','有人吗','在不在']))
+    return{t:S.greeting,i:'greeting'};
+  if(hit(m,['活动','优惠','半价','优惠券','代金券','折扣券','便宜','折扣','立减','免车费','车费','路费','免单'])){
+    var l=['我们目前的活动有这几种👇'];
+    for(var i=0;i<KB.activities.length;i++)l.push('· '+KB.activities[i].name+'：'+KB.activities[i].desc);
+    l.push(S.price_suffix||'');return{t:l.join('\n'),i:'activity'};
+  }
+  if(isQ(m))for(var k=0;k<KB.faq.length;k++)
+    if(hit(m,KB.faq[k].keys||[]))return{t:KB.faq[k].a,i:'faq:'+KB.faq[k].q};
+
+  var rec=byPain(m,KB);
+  if(rec.length&&!hit(m,['多少钱','价格','收费','价位'])){
+    var l2=['您这个情况我们建议这个👇'];
+    for(var a=0;a<rec.length;a++)l2.push('· '+rec[a].name+'（'+rec[a].tag+'）：'+rec[a].desc+'，'+rec[a].price);
+    l2.push(KB.lead_questions.ask_time);return{t:l2.join('\n'),i:'recommend'};
+  }
+  if(hit(m,['价格','多少钱','收费','价位','多少','贵','预算'])){
+    var l3=[S.price_prefix];
+    for(var b=0;b<KB.services.length;b++)l3.push('· '+KB.services[b].name+'（'+KB.services[b].tag+'）：'+KB.services[b].price);
+    l3.push(S.price_suffix);return{t:l3.join('\n'),i:'price'};
+  }
+  if(hit(m,['项目','有什么','做啥','能做什么','按摩','推拿','spa','服务','调理'])){
+    var l4=['我们主打正规上门项目，您看哪个合适：'];
+    for(var c=0;c<KB.services.length;c++)l4.push('· '+KB.services[c].name+'：'+KB.services[c].desc+'（'+KB.services[c].price+'）');
+    l4.push(S.service_suffix);return{t:l4.join('\n'),i:'service'};
+  }
+  if(hit(m,['正规','安全','靠谱','骗子','持证','资质','可信','真吗','假的','放心','隐私'])){
+    var sf=KB.safety||[];
+    return{t:'放心~ '+(sf[0]||'')+' '+(sf[1]||'')+' '+(KB.fee_rules||{}).no_hidden+' 需要我帮您预约体验吗？',i:'safety'};
+  }
+  if(hit(m,['男生','男的','男士','女技师','男技师','指定','选人']))
+    return{t:'可以，男女技师都有，下单时备注偏好就行，系统按需求派单~ 想约哪个项目？',i:'gender'};
+  var loc=m.match(/[\u4e00-\u9fa5]{2,10}?(市|区|县|镇|街道|小区)/);
+  if(hit(m,['城市','哪里','覆盖','地址','区域','住在','我在','我家','小区','这边','我住'])||loc){
+    if(loc){
+      var p=loc[0].replace(/^(我?(家|住)?在?|住在|地址是|这边是)/,'');
+      return{t:'好的，'+p+'这边我们能上门~ 方便说下想约什么项目、什么时候方便吗？我帮您提交。',i:'loc_confirmed'};
+    }
+    return{t:'我们已开通 156 个城市站点，您在哪个城市？我帮您确认附近站点并安排。',i:'location'};
+  }
+  if(hit(m,['今天','明天','后天','晚上','下午','上午','中午','周末','礼拜','方便','几点','现在'])||/[0-9]{1,2}[:：点]/.test(m))
+    return{t:'好的，您这边时间我先记下~ 麻烦再确认下项目和上门地址（哪个城市哪个小区），我马上帮您提交预约。',i:'time_given'};
+  if(hit(m,['上门费','多远','距离','车费','路费','免车费'])){
+    var fr=KB.fee_rules||{};return{t:(fr.distance||'')+' '+(fr.upfront||''),i:'fee'};
+  }
+  if(hit(m,['怎么约','预约','下单','流程','怎么弄','怎么定','怎么买','怎么订','怎么开始'])){
+    var st=(KB.booking||{}).steps||[],out='预约很简单，四步搞定：\n';
+    for(var e=0;e<st.length;e++)out+=(e+1)+'. '+st[e]+'\n';
+    out+=(KB.booking||{}).note||'';out+=(KB.lead_questions||{}).ask_first||'';
+    return{t:out,i:'booking'};
+  }
+  if(hit(m,['效果','有用','能好','治','根治','病','疼','酸']))
+    return{t:'正规推拿和 SPA 主要帮助缓解疲劳、改善睡眠、放松肌肉，属于日常养护。如果有明确疾病还是建议先去医院。您主要是哪里不舒服？我给您挑项目。',i:'effect'};
+  for(var q=0;q<KB.faq.length;q++)if(hit(m,KB.faq[q].keys||[]))return{t:KB.faq[q].a,i:'faq:'+KB.faq[q].q};
+  return{t:KB.fallback,i:'fallback'};
+}
+function S2(KB,k){return k==='transfer'?KB.transfer_script:KB.boundary_script}
+
+/* ---- 界面 ---- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function scrollBottom(){window.scrollTo(0,document.body.scrollHeight)}
+function add(m,who,i){
+  var d=document.createElement('div');
+  d.className='msg '+who;
+  var h='<div class="bub">'+esc(m)+'</div>';
+  if(who==='ai')h+='<div class="meta"><span>'+esc(i||'')+'</span><button onclick="mark('+fb.length+',0)">👍对</button><button onclick="mark('+fb.length+',1)">👎答得不对</button></div>';
+  d.innerHTML=h;document.getElementById('log').appendChild(d);
+  scrollBottom();
+}
+function quick(v){document.getElementById('inp').value=v;send()}
+function send(){
+  var v=document.getElementById('inp').value.trim();if(!v)return;
+  document.getElementById('inp').value='';
+  add(v,'me');hist.push({user:v,bot:''});
+  var r=reply(v);
+  setTimeout(function(){add(r.t,'ai',r.i);hist[hist.length-1].bot=r.t;
+    if(hist.length>20)hist=hist.slice(-20)},80);
+}
+function mark(idx,bad){
+  var h=hist[idx];if(!h)return;
+  if(!bad){alert('已记录 👍');return}
+  var why=prompt('哪里不对？（例：价格不对 / 太机械 / 会说错话 / 答非所问）','价格不对');
+  if(why===null)return;
+  fb.push({user:h.user,bot:h.bot,reason:why,ts:new Date().toISOString().slice(0,16)});
+  try{localStorage.setItem(LS_FB,JSON.stringify(fb))}catch(e){}
+  renderFB();alert('已记录，需求清单 +1');
+}
+function openSet(){fillSet();document.getElementById('p-set').className='ov'}
+function openFB(){renderFB();document.getElementById('p-fb').className='ov'}
+function closeOv(id){document.getElementById(id).className='ov hide'}
+function fillSet(){
+  var KB=getKB();
+  document.getElementById('s_services').value=KB.services.map(function(s){return s.name+' | '+s.price+' | '+s.desc+' | '+s.tag}).join('\n');
+  document.getElementById('s_acts').value=KB.activities.map(function(a){return a.name+' | '+a.desc}).join('\n');
+  document.getElementById('s_fee').value=(KB.fee_rules||{}).distance||'';
+  document.getElementById('s_upfront').value=(KB.fee_rules||{}).upfront||'';
+  document.getElementById('s_safety').value=(KB.safety||[]).join('\n');
+  document.getElementById('s_booking').value=((KB.booking||{}).steps||[]).join('\n');
+  var S=KB.lead_script||{};
+  document.getElementById('s_greet').value=S.greeting||'';
+  document.getElementById('s_pp').value=S.price_prefix||'';
+  document.getElementById('s_ps').value=S.price_suffix||'';
+  document.getElementById('s_ss').value=S.service_suffix||'';
+  document.getElementById('s_transfer').value=KB.transfer_script||'';
+  document.getElementById('s_boundary').value=KB.boundary_script||'';
+  document.getElementById('s_fallback').value=KB.fallback||'';
+  document.getElementById('s_faq').value=KB.faq.map(function(f){return (f.keys||[]).join(',')+' | '+f.q+' | '+f.a}).join('\n');
+}
+function saveKB(){
+  var KB=getKB();
+  KB.services=document.getElementById('s_services').value.split('\n').filter(Boolean).map(function(l){
+    var p=l.split('|').map(function(x){return (x||'').trim()});
+    var old=KB.services.filter(function(s){return s.name===p[0]})[0]||{};
+    return{name:p[0]||'',price:p[1]||'',desc:p[2]||'',tag:p[3]||'',pain:old.pain||[]};
+  });
+  KB.activities=document.getElementById('s_acts').value.split('\n').filter(Boolean).map(function(l){
+    var p=l.split('|').map(function(x){return (x||'').trim()});
+    return{name:p[0]||'',desc:p[1]||''};
+  });
+  var fr=KB.fee_rules||{};
+  fr.distance=document.getElementById('s_fee').value;fr.upfront=document.getElementById('s_upfront').value;KB.fee_rules=fr;
+  KB.safety=document.getElementById('s_safety').value.split('\n').filter(Boolean);
+  KB.booking=KB.booking||{};KB.booking.steps=document.getElementById('s_booking').value.split('\n').filter(Boolean);
+  var S=KB.lead_script||{};
+  S.greeting=document.getElementById('s_greet').value;S.price_prefix=document.getElementById('s_pp').value;
+  S.price_suffix=document.getElementById('s_ps').value;S.service_suffix=document.getElementById('s_ss').value;
+  KB.lead_script=S;KB.transfer_script=document.getElementById('s_transfer').value;
+  KB.boundary_script=document.getElementById('s_boundary').value;KB.fallback=document.getElementById('s_fallback').value;
+  KB.faq=document.getElementById('s_faq').value.split('\n').filter(Boolean).map(function(l){
+    var p=l.split('|');return{keys:(p[0]||'').split(',').map(function(x){return x.trim()}).filter(Boolean),q:(p[1]||'').trim(),a:(p[2]||'').trim()};
+  });
+  saveStore();alert('已保存，立刻生效。回对话再测一遍。');
+}
+function loadFB(){try{return JSON.parse(localStorage.getItem(LS_FB)||'[]')}catch(e){return[]}}
+function renderFB(){
+  fb=loadFB();
+  document.getElementById('fbc').textContent=fb.length;
+  document.getElementById('fbn').textContent=fb.length?'('+fb.length+')':'';
+  var h='';
+  for(var i=0;i<fb.length;i++)h+='<div class="fb"><div class="q">客人：'+esc(fb[i].user)+'</div><div class="a">AI：'+esc(fb[i].bot)+'</div><div class="a">❌ '+esc(fb[i].reason)+'　<span style="opacity:.6">'+esc(fb[i].ts)+'</span></div></div>';
+  document.getElementById('fblist').innerHTML=h||'<div class="a" style="color:#9ca3af">还没有记录。回对话，遇到答得不对的点👎。</div>';
+}
+function clearFB(){if(confirm('清空全部已收集的问题？')){fb=[];try{localStorage.removeItem(LS_FB)}catch(e){}renderFB()}}
+function exportFB(){
+  if(!fb.length){alert('还没有收集到问题，先去测一轮');return}
+  var t='# 富足到家 · AI 客服试用问题清单\n\n导出时间：'+new Date().toLocaleString()+'\n共 '+fb.length+' 条\n\n';
+  fb.forEach(function(x,i){t+='## '+(i+1)+'. '+x.reason+'\n- 客人问：'+x.user+'\n- AI 答：'+x.bot+'\n- 问题：'+x.reason+'\n- 时间：'+x.ts+'\n\n'});
+  t+='---\n说明：每一条都是试用中发现需要改的地方，请按「一期做/二期做/做不了」分类后再谈。\n';
+  try{
+    var b=new Blob([t],{type:'text/markdown;charset=utf-8'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download='AI客服试用问题清单.md';a.click();
+    alert('已导出，请把文件发给对接人。');
+  }catch(e){
+    var d=document.createElement('textarea');d.value=t;document.body.appendChild(d);d.select();
+    try{document.execCommand('copy');alert('已复制到剪贴板，粘贴保存为 .md 文件即可')}catch(e2){alert('请手动复制下方内容')}
+    document.body.removeChild(d);
+  }
+}
+/* init */
+fb=loadFB();renderFB();
+(function(){var d=document.createElement('div');d.className='sys';d.textContent='试用演示版 · 网页模拟，未接入真实客户';document.getElementById('log').appendChild(d)})();
+add(getKB().lead_script.greeting,'ai','greeting');
+</script>
+</body>
+</html>
